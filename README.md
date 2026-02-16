@@ -26,13 +26,14 @@ A **web-based application** for students to track their expenses, manage budgets
 
 ## 🧩 Regex Catalog
 
-| Field       | Regex Rule | Regex Expression | Example (Valid) | Example (Invalid) |
-|------------|--------------|----------------|-----------------|
-| Description | No leading/trailing spaces, no duplicate words | /^\S(?:.*\S)?$/ |`"Morning coffee"` | `" Coffee"` or `"coffee coffee"` |
-| Amount      | Number, max 2 decimals | |`"25"`, `"25.50"` | `"25.555"`, `"abc"` |
-| Date        | `YYYY-MM-DD` format, not future | /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/ |`"2025-06-01"` | `"01-06-2025"`, `"2026-12-01"` |
-| Category    | Letters, spaces, hyphens only | /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/ |`"Food-Dining"` | `"Food123"` |
-| Duplicate Words    | case sensitive duplicate checking| /\b(\w+)\b\s+\b\1\b/ |`"books books" matches` | `"Books books" passes` |
+| Field            | Regex Rule                               | Regex Expression                                         | Example (Valid)         | Example (Invalid)           |
+|-----------------|-----------------------------------------|---------------------------------------------------------|-------------------------|-----------------------------|
+| Description      | No leading/trailing spaces, no duplicate words | `/^\S(?:.*\S)?$/`                                       | `"Morning coffee"`      | `" Coffee"`, `"coffee coffee"` |
+| Amount           | Number, max 2 decimals                    | `/^\d+(\.\d{1,2})?$/`                                  | `"25"`, `"25.50"`      | `"25.555"`, `"abc"`         |
+| Date             | `YYYY-MM-DD` format, not future          | `/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/`      | `"2025-06-01"`         | `"01-06-2025"`, `"2026-12-01"` |
+| Category         | Letters, spaces, hyphens only            | `/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/`                      | `"Food-Dining"`         | `"Food123"`                  |
+| Duplicate Words  | Case-sensitive duplicate checking        | `/\b(\w+)\b\s+\b\1\b/`                                  | `"books books" matches` | `"Books books" passes`       |
+
 
 
 **Search:** Regex patterns can be entered in the search box. Use the checkbox to toggle **case-insensitive** searches. Matches are highlighted in the table.
@@ -62,16 +63,59 @@ A **web-based application** for students to track their expenses, manage budgets
 ---
 
 ## 🧪 Running Tests
-Validation tests are included to ensure form inputs meet the required criteria.
 
-1. Open `tests.html` in a browser.
-2. Results will be displayed under the **Form validation Tests** heading.
-3. Each test prints **PASSED** or **FAILED** for:
-   - Description validation
-   - Amount validation
-   - Date validation
-   - Category validation
-   - Full transaction object validation
+The app includes a set of automated validation tests to ensure that all transaction inputs follow the defined rules. These tests are written in JavaScript and are executed when opening `tests.html`.
+
+### How it works
+
+1. Open `tests.html` in a web browser.
+2. The page automatically runs the code in `scripts/tests.js`.
+3. Each test in `tests.js` calls the validation functions defined in `validators.js`:
+   - `validateDescription()`
+   - `validateAmount()`
+   - `validateDate()`
+   - `validateCategory()`
+   - `validateTransaction()` (for checking all fields together)
+4. The test script compares the returned messages from these validators with the expected results.
+5. Each test prints a line in the `#results` div:
+   - `"PASSED"` if the validation output matches the expected result.
+   - `"FAILED"` if it doesn’t.
+6. This provides a clear, real-time indication of which validations are working and which are not.
+
+### Adding New Tests
+
+To add new tests for additional validation rules or edge cases:
+
+1. Open `scripts/tests.js`.
+2. Use the existing test pattern:
+```javascript
+// Example: testing description validation for a leading space
+let testResult = validateDescription(" Coffee");
+let testPassed = testResult === "Description cannot start or end with spaces."; // check against expected message
+printTestResult("Description leading space", testPassed);
+
+// Example: testing a valid description
+let testResult2 = validateDescription("Morning coffee");
+let testPassed2 = testResult2 === ""; // empty string means valid
+printTestResult("Description valid input", testPassed2);
+
+3. For testing full transactions:
+
+let transaction = {
+    description: "Lunch",
+    amount: "15.50",
+    category: "Food",
+    date: "2025-06-01"
+};
+let errors = validateTransaction(transaction);
+let allPassed = !errors.description && !errors.amount && !errors.category && !errors.date;
+printTestResult("Full transaction test", allPassed);
+
+
+4. Save changes and refresh tests.html in your browser to see the updated test results.
+
+💡 Note: Each test is isolated, so you can safely add new cases without affecting existing ones
+
 
 ---
 
@@ -85,22 +129,24 @@ Validation tests are included to ensure form inputs meet the required criteria.
 5. Monitor console for debugging (no errors expected).
 
 
-
 📂 File Structure
+
 /
 ├─ index.html
 ├─ styles/
-│  └─ main.css
+│ └─ main.css
 ├─ scripts/
-│  ├─ validators.js
-│  ├─ ui.js
-│  ├─ state.js
-│  ├─ storage.js
-│  ├─ search.js
-│  └─ tests.js
+│ ├─ validators.js
+│ ├─ ui.js
+│ ├─ state.js
+│ ├─ storage.js
+│ ├─ search.js
+│ └─ tests.js
 ├─ tests.html
 ├─ README.md
 └─ seed.json
+
+
 
 Author
 
