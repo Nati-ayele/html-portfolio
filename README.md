@@ -7,8 +7,6 @@ A **web-based application** for students to track their expenses, manage budgets
 ## 🎯 Chosen Theme
 **Student Finance Tracker** – Manage personal budgets, add transactions, track spending, and visualize trends.  
 
-**Note:** This app focuses on financial tracking for students, including budget limits, category analysis, and currency conversions.
-
 ---
 
 ## ⚡ Features
@@ -98,9 +96,9 @@ printTestResult("Description leading space", testPassed);
 let testResult2 = validateDescription("Morning coffee");
 let testPassed2 = testResult2 === ""; // empty string means valid
 printTestResult("Description valid input", testPassed2);
-
+```
 3. For testing full transactions:
-
+```
 let transaction = {
     description: "Lunch",
     amount: "15.50",
@@ -110,7 +108,7 @@ let transaction = {
 let errors = validateTransaction(transaction);
 let allPassed = !errors.description && !errors.amount && !errors.category && !errors.date;
 printTestResult("Full transaction test", allPassed);
-
+```
 
 4. Save changes and refresh tests.html in your browser to see the updated test results.
 
