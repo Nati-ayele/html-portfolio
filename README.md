@@ -1,6 +1,11 @@
 # Student Finance Tracker
 
 A **web-based application** for students to track their expenses, manage budgets, and analyze spending trends. Built with HTML, CSS, and JavaScript, featuring modular architecture, validation, and accessibility-focused design.
+Live Demo:
+
+Repository:
+
+Demo Video:
 
 ---
 
@@ -8,7 +13,6 @@ A **web-based application** for students to track their expenses, manage budgets
 **Student Finance Tracker** – Manage personal budgets, add transactions, track spending, and visualize trends.  
 
 ---
-
 ## ⚡ Features
 - Add, edit, and delete transactions.
 - Sort transactions by **Description, Amount, Category, or Date**.
@@ -128,7 +132,7 @@ printTestResult("Full transaction test", allPassed);
 
 
 📂 File Structure
-
+```
 /
 ├─ index.html
 ├─ styles/
@@ -143,7 +147,7 @@ printTestResult("Full transaction test", allPassed);
 ├─ tests.html
 ├─ README.md
 └─ seed.json
-
+```
 
 
 Author
