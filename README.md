@@ -179,6 +179,4 @@ printTestResult("Full transaction test", allPassed);
 Author
 ---
 Natnael Ayele
----
 email: n.eticha@alustudent.com
----
