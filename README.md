@@ -177,8 +177,6 @@ printTestResult("Full transaction test", allPassed);
 
 
 Author
-
-Natnael Ayele – © 2026
-GitHub: NatnaelAyele
+Natnael Ayele
 email: n.eticha@alustudent.com
 
