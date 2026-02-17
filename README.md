@@ -17,7 +17,7 @@ A **web-based application** for students to track their expenses, manage budgets
 - Add, edit, and delete transactions.
 - Sort transactions by **Description, Amount, Category, or Date**.
 - Regex-based search with **case toggle** and accessible highlighting.
-- Track total transactions, total spent, top category, and weekly trends.
+- Track total transactions, total spent, top category(Most frequent), and weekly trends.
 - Manage **budget caps** with alerts when exceeding limit.
 - **Currency conversion** between USD, EUR, and RWF.
 - Import and export transactions as JSON.
