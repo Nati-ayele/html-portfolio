@@ -175,8 +175,10 @@ printTestResult("Full transaction test", allPassed);
 └─ seed.json
 ```
 
-
+---
 Author
+---
 Natnael Ayele
+---
 email: n.eticha@alustudent.com
-
+---
