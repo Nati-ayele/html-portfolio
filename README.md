@@ -54,6 +54,32 @@ A **web-based application** for students to track their expenses, manage budgets
 
 ---
 
+## 🔄 Import & Export Feature
+
+Your data can be **exported** or **imported** in JSON format.
+
+### Export
+- Export all transactions to a JSON file.  
+- Contains all transaction fields including optional `id`, `createdAt`, `updatedAt`.
+
+### Import
+- Import **sample data** or your **custom JSON**.
+
+#### Rules for Custom JSON Import
+1. **File format:** Must be valid JSON.  
+2. **Mandatory keys per transaction:** `description`, `amount`, `category`, `date`  
+3. **Optional keys:** `id`, `createdAt`, `updatedAt`  
+4. **No extra keys:** Files with other keys will fail.  
+5. **Field validation:**  
+   - `description`: Leading/trailing spaces allowed; will be trimmed automatically.  
+   - `amount`: Number > 0, max 2 decimals.  
+   - `category`: Letters, spaces, hyphens only.  
+   - `date`: Must be in `YYYY-MM-DD` format; future dates not allowed.  
+
+Invalid transactions will cause the import to fail and notify which ones are invalid.
+
+---
+
 ## ♿ Accessibility Notes
 - All interactive elements have proper `aria-labels` and roles.
 - Error messages and status updates use `aria-live="polite"` for screen readers.
