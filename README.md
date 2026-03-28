@@ -1,181 +1,249 @@
-# Student Finance Tracker
+# Focus Time
 
-A **web-based application** for students to track their expenses, manage budgets, and analyze spending trends. Built with HTML, CSS, and JavaScript, featuring modular architecture, validation, and accessibility-focused design.
+A focused learning companion that lets you search YouTube videos and GitHub repositories, then save items into playlists with analytics.
 
-## Demo Link:
-##  Live website:
-##  Features
+## Features
+- Search YouTube videos and GitHub repositories by topic.
+- YouTube results avoid Shorts by excluding videos under 2 minutes.
+- Save items into playlists with categories.
+- Analytics dashboard for saved videos by category.
+- Authentication (register/login) with JWT.
 
+## Tech Stack
+- Backend: FastAPI, SQLAlchemy, PostgreSQL, Uvicorn
+- Frontend: HTML, CSS, JavaScript
+- Charts: Chart.js
 
----
+## Prerequisites
+- Python 3.10+ recommended
+- PostgreSQL database
+- YouTube Data API key and (optional) GitHub token
 
-## 🎯 Chosen Theme
-**Student Finance Tracker** – Manage personal budgets, add transactions, track spending, and visualize trends.  
+## Environment Variables
+Create a .env file in the project root (it is already gitignored) with:
 
----
-## ⚡ Features
-- Add, edit, and delete transactions.
-- Sort transactions by **Description, Amount, Category, or Date**.
-- Regex-based search with **case toggle** and accessible highlighting.
-- Track total transactions, total spent, top category(Most frequent), and weekly trends.
-- Manage **budget caps** with alerts when exceeding limit.
-- **Currency conversion** between USD, EUR, and RWF.
-- Import and export transactions as JSON.
-- Modular code structure (`validators.js`, `ui.js`, `state.js`, `storage.js`, `search.js`).
-- Fully responsive and accessible design with keyboard navigation.
-
----
-
-## 🧩 Regex Catalog
-
-| Field            | Regex Rule                               | Regex Expression                                         | Example (Valid)         | Example (Invalid)           |
-|-----------------|-----------------------------------------|---------------------------------------------------------|-------------------------|-----------------------------|
-| Description      | No leading/trailing spaces, no duplicate words | `/^\S(?:.*\S)?$/`                                       | `"Morning coffee"`      | `" Coffee"`, `"coffee coffee"` |
-| Amount           | Number, max 2 decimals                    | `/^\d+(\.\d{1,2})?$/`                                  | `"25"`, `"25.50"`      | `"25.555"`, `"abc"`         |
-| Date             | `YYYY-MM-DD` format, not future          | `/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/`      | `"2025-06-01"`         | `"01-06-2025"`, `"2026-12-01"` |
-| Category         | Letters, spaces, hyphens only            | `/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/`                      | `"Food-Dining"`         | `"Food123"`                  |
-| Duplicate Words  | Case-sensitive duplicate checking        | `/\b(\w+)\b\s+\b\1\b/`                                  | `"books books" matches` | `"Books books" passes`       |
-
-
-
-**Search:** Regex patterns can be entered in the search box. Use the checkbox to toggle **case-insensitive** searches. Matches are highlighted in the table.
-
----
-
-## ⌨️ Keyboard Map
-| Key / Shortcut | Action |
-|----------------|--------|
-| `Tab`          | Navigate through form inputs, buttons, and links |
-| `Shift + Tab`  | Navigate backward |
-| `Enter`        | Activate focused button, link, or sort arrow (sorts the table by that column) |
-| Skip link (`Skip to main content`) | Focus jumps directly to the main content |
-| Arrow keys| Navigate up and down in the web page using tab + Enter (sorting only) |
-| `Space`| Activate buttons (e.g., Save Transaction, Export/Import)  |
-
----
-
-## 🔄 Import & Export Feature
-
-Your data can be **exported** or **imported** in JSON format.
-
-### Export
-- Export all transactions to a JSON file.  
-- Contains all transaction fields including optional `id`, `createdAt`, `updatedAt`.
-
-### Import
-- Import **sample data** or your **custom JSON**.
-
-#### Rules for Custom JSON Import
-1. **File format:** Must be valid JSON.  
-2. **Mandatory keys per transaction:** `description`, `amount`, `category`, `date`  
-3. **Optional keys:** `id`, `createdAt`, `updatedAt`  
-4. **No extra keys:** Files with other keys will fail.  
-5. **Field validation:**  
-   - `description`: Leading/trailing spaces allowed; will be trimmed automatically.  
-   - `amount`: Number > 0, max 2 decimals.  
-   - `category`: Letters, spaces, hyphens only.  
-   - `date`: Must be in `YYYY-MM-DD` format; future dates not allowed.  
-
-Invalid transactions will cause the import to fail and notify which ones are invalid.
-
----
-
-## ♿ Accessibility Notes
-- All interactive elements have proper `aria-labels` and roles.
-- Error messages and status updates use `aria-live="polite"` for screen readers.
-- Skip links enable bypassing navigation to reach main content directly.
-- Focus styles on inputs, buttons, and links are clearly visible.
-- Color contrast passes WCAG AA standards.
-- Semantic HTML structure with proper headings hierarchy (`<h1>` → `<h2>` → `<h3>`).
-
----
-
-## 🧪 Running Tests
-
-The app includes a set of automated validation tests to ensure that all transaction inputs follow the defined rules. These tests are written in JavaScript and are executed when opening `tests.html`.
-
-### How it works
-
-1. Open `tests.html` in a web browser.
-2. The page automatically runs the code in `scripts/tests.js`.
-3. Each test in `tests.js` calls the validation functions defined in `validators.js`:
-   - `validateDescription()`
-   - `validateAmount()`
-   - `validateDate()`
-   - `validateCategory()`
-   - `validateTransaction()` (for checking all fields together)
-4. The test script compares the returned messages from these validators with the expected results.
-5. Each test prints a line in the `#results` div:
-   - `"PASSED"` if the validation output matches the expected result.
-   - `"FAILED"` if it doesn’t.
-6. This provides a clear, real-time indication of which validations are working and which are not.
-
-### Adding New Tests
-
-To add new tests for additional validation rules or edge cases:
-
-1. Open `scripts/tests.js`.
-2. Use the existing test pattern:
-```javascript
-// Example: testing description validation for a leading space
-let testResult = validateDescription(" Coffee");
-let testPassed = testResult === "Description cannot start or end with spaces."; // check against expected message
-printTestResult("Description leading space", testPassed);
-
-// Example: testing a valid description
-let testResult2 = validateDescription("Morning coffee");
-let testPassed2 = testResult2 === ""; // empty string means valid
-printTestResult("Description valid input", testPassed2);
 ```
-3. For testing full transactions:
-```
-let transaction = {
-    description: "Lunch",
-    amount: "15.50",
-    category: "Food",
-    date: "2025-06-01"
-};
-let errors = validateTransaction(transaction);
-let allPassed = !errors.description && !errors.amount && !errors.category && !errors.date;
-printTestResult("Full transaction test", allPassed);
+YOUTUBE_API_KEY=your_youtube_api_key
+Github_Token=your_github_token_optional
+Secret_Key=your_jwt_secret
+DATABASE_URL=postgresql://user:password@host:port/dbname
 ```
 
-4. Save changes and refresh tests.html in your browser to see the updated test results.
+Notes:
+- Github_Token is optional but increases GitHub API rate limits.
+- Secret_Key should be a long, random string for JWT signing.
 
-💡 Note: Each test is isolated, so you can safely add new cases without affecting existing ones
+## Install Dependencies
+From the project root:
 
-
----
-
-## 🚀 How to Run
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/NatnaelAyele/student-finance-tracker.git
-2. Open index.html in a browser.
-3. Navigate through sections via navigation bar or skip link.
-4. Add, edit, sort, search, and export/import transactions.
-5. Monitor console for debugging (no errors expected).
-
-
-📂 File Structure
 ```
-/
-├─ index.html
-├─ styles/
-│ └─ main.css
-├─ scripts/
-│ ├─ validators.js
-│ ├─ ui.js
-│ ├─ state.js
-│ ├─ storage.js
-│ ├─ search.js
-│ └─ tests.js
-├─ tests.html
-├─ README.md
-└─ seed.json
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
----
-Author
----
-Natnael Ayele n.eticha@alustudent.com
+## Run the Backend (API)
+```
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Health check:
+- http://127.0.0.1:8000/api/health
+
+FastAPI docs:
+- http://127.0.0.1:8000/docs
+
+## Run the Frontend
+The frontend is static and lives in frontend/index.html.
+
+Option 1: Use a simple static server from the project root:
+```
+python -m http.server 5173
+```
+Then open:
+- http://127.0.0.1:5173/frontend/index.html
+
+Option 2: Open frontend/index.html directly in a browser.
+
+Important: The frontend uses API_BASE_URL = "/api". If your frontend is not served from the same origin as the backend, update frontend/js/config.js to point to the full backend URL, for example:
+
+```
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+```
+
+## Deployment Notes
+- Set the same environment variables on your host (DATABASE_URL, YOUTUBE_API_KEY, Secret_Key, and optional Github_Token).
+- Run the API with a production server (for example, Uvicorn behind a process manager).
+- Serve frontend/index.html from the same domain or configure CORS and API_BASE_URL accordingly.
+
+## Deployment and Load Balancer Configuration
+
+This application was deployed using a multi-server architecture with two application servers and one load balancer to ensure high availability, scalability, and proper separation of concerns.
+
+### Architecture Overview
+- Web-01 and Web-02: Each server runs a full instance of the application (frontend + FastAPI backend).
+- lb-01 (Load Balancer): HAProxy distributes incoming traffic between Web-01 and Web-02.
+- Database: PostgreSQL is hosted on Web-01 and accessed remotely by both servers.
+
+### Backend Deployment (Web-01 and Web-02)
+
+1. Project setup
+   - Copy the full application (frontend + backend) to both servers (for example, with scp).
+   - Create a Python virtual environment on each server:
+
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate
+     pip install -r requirements.txt
+     pip install psycopg2-binary
+     ```
+
+2. Database configuration
+   - SQLite was replaced with PostgreSQL to allow shared access across servers.
+   - Configure the backend with a shared PostgreSQL URL:
+
+     ```python
+     DATABASE_URL = "postgresql://<user>:<password>@<web-01-ip>:5432/<db_name>"
+     ```
+
+   - PostgreSQL on Web-01 was configured to accept remote connections from Web-02.
+
+3. Running the backend
+   - Serve the FastAPI app using Gunicorn with Uvicorn workers:
+
+     ```bash
+     gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 127.0.0.1:8000
+     ```
+
+4. Process management
+   - A systemd service keeps the backend running and restarts it automatically:
+
+     ```ini
+     [Unit]
+     Description=FastAPI Service
+     After=network.target
+
+     [Service]
+     User=ubuntu
+     WorkingDirectory=/home/ubuntu/Focus-time
+     Environment="PATH=/home/ubuntu/Focus-time/venv/bin"
+     ExecStart=/home/ubuntu/Focus-time/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 127.0.0.1:8000
+     Restart=always
+
+     [Install]
+     WantedBy=multi-user.target
+     ```
+
+### Frontend and Reverse Proxy (Nginx)
+
+Nginx was configured on both Web-01 and Web-02 to serve the frontend and proxy API requests to the backend.
+
+```nginx
+server {
+    listen 80;
+    server_name _;
+
+    root /home/ubuntu/Focus-time/frontend;
+    index index.html;
+
+    location / {
+        try_files $uri /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+Key points:
+- Static frontend files are served directly by Nginx.
+- Requests to /api/ are proxied to the local FastAPI backend.
+- The frontend uses:
+
+  ```javascript
+  const API_BASE_URL = "/api";
+  ```
+
+- FastAPI uses:
+
+  ```python
+  app = FastAPI(root_path="/api")
+  ```
+
+  This ensures correct routing behind the reverse proxy.
+
+### Load Balancer Configuration (HAProxy on lb-01)
+
+HAProxy distributes traffic between Web-01 and Web-02 using round-robin.
+
+```haproxy
+frontend http_in
+    bind *:80
+    bind *:443 ssl crt /etc/ssl/certs/focuslearn.pem
+    mode http
+
+    redirect scheme https if !{ ssl_fc }
+    default_backend web_servers
+
+backend web_servers
+    mode http
+    balance roundrobin
+    option forwardfor
+
+    server web01 <WEB-01-IP>:80 check
+    server web02 <WEB-02-IP>:80 check
+```
+
+Key points:
+- SSL termination happens at the load balancer.
+- Round-robin load balancing distributes requests evenly.
+- Health checks ensure only healthy servers receive traffic.
+- option forwardfor preserves the original client IP.
+
+### End-to-End Request Flow
+
+1. A client sends a request to the load balancer (lb-01) via HTTP or HTTPS.
+2. HAProxy forwards the request to either Web-01 or Web-02.
+3. Nginx on the selected server:
+   - Serves static frontend files for /
+   - Proxies /api/ requests to the local FastAPI backend
+4. The backend processes the request and interacts with the shared PostgreSQL database.
+5. The response is returned through Nginx to HAProxy and back to the client.
+
+### Summary
+
+This deployment ensures:
+- High availability through multiple application servers
+- Consistent data using a centralized PostgreSQL database
+- Efficient request routing via HAProxy
+- Clean separation of concerns between frontend, backend, and load balancing
+
+## APIs Used and Attribution
+- YouTube Data API v3
+  - Docs: https://developers.google.com/youtube/v3/docs/search/list
+  - Used for: video search and statistics.
+  - Credit: Google / YouTube Developers.
+
+- GitHub REST API (Search Repositories)
+  - Docs: https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#search-repositories
+  - Used for: repository search.
+  - Credit: GitHub.
+
+## Libraries and Resources
+- FastAPI: https://fastapi.tiangolo.com/
+- SQLAlchemy: https://www.sqlalchemy.org/
+- Uvicorn: https://www.uvicorn.org/
+- Chart.js: https://www.chartjs.org/
+- python-jose (JWT): https://python-jose.readthedocs.io/
+- passlib (bcrypt): https://passlib.readthedocs.io/
+- Requests: https://requests.readthedocs.io/
+
+## Project Structure
+```
+app/           # FastAPI backend
+frontend/      # Static frontend
+requirements.txt
+```
