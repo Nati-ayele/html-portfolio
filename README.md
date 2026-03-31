@@ -1,6 +1,7 @@
-# Focus Time
+# Focused-learning-space
 
 A focused learning companion that lets you search YouTube videos and GitHub repositories, then save items into playlists with analytics.
+The app name "estiazo" is a Greek word meaning "to focus."
 
 ## Features
 - Search YouTube videos and GitHub repositories by topic.
@@ -32,6 +33,25 @@ DATABASE_URL=postgresql://user:password@host:port/dbname
 Notes:
 - Github_Token is optional but increases GitHub API rate limits.
 - Secret_Key should be a long, random string for JWT signing.
+
+Local defaults vs deployment:
+- Local testing uses SQLite in [app/database/db.py](app/database/db.py) with:
+
+  ```python
+  DATABASE_URL = "sqlite:///./focus_learn.db"
+  ```
+
+- The frontend local default in [frontend/js/config.js](frontend/js/config.js) is:
+
+  ```javascript
+  const API_BASE_URL = "http://localhost:8000";
+  ```
+
+- When deploying, switch the backend database to PostgreSQL and set the frontend API base to a relative path so the reverse proxy can route it, for example:
+
+  ```javascript
+  const API_BASE_URL = "api/";
+  ```
 
 ## Install Dependencies
 From the project root:
@@ -65,10 +85,10 @@ Then open:
 
 Option 2: Open frontend/index.html directly in a browser.
 
-Important: The frontend uses API_BASE_URL = "/api". If your frontend is not served from the same origin as the backend, update frontend/js/config.js to point to the full backend URL, for example:
+Important: The frontend local default uses `API_BASE_URL = "http://localhost:8000"`. If your frontend is not served from the same origin as the backend, update frontend/js/config.js to point to the full backend URL, for example:
 
 ```
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "http://127.0.0.1:8000";
 ```
 
 ## Deployment Notes
@@ -78,35 +98,34 @@ const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 ## Deployment and Load Balancer Configuration
 
-This application was deployed using a multi-server architecture with two application servers and one load balancer to ensure high availability, scalability, and proper separation of concerns.
+This application can be deployed using a multi-server architecture with two application servers and one load balancer to ensure high availability, scalability, and proper separation of concerns.
 
 ### Architecture Overview
-- Web-01 and Web-02: Each server runs a full instance of the application (frontend + FastAPI backend).
-- lb-01 (Load Balancer): HAProxy distributes incoming traffic between Web-01 and Web-02.
-- Database: PostgreSQL is hosted on Web-01 and accessed remotely by both servers.
+- App servers: Each server runs a full instance of the application (frontend + FastAPI backend).
+- Load balancer: HAProxy distributes incoming traffic between app servers.
+- Database: PostgreSQL is hosted on one node and accessed remotely by the others.
 
 ### Backend Deployment (Web-01 and Web-02)
 
 1. Project setup
-   - Copy the full application (frontend + backend) to both servers (for example, with scp).
+   - Copy the full application (frontend + backend) to both servers (with scp).
    - Create a Python virtual environment on each server:
 
      ```bash
      python3 -m venv venv
      source venv/bin/activate
      pip install -r requirements.txt
-     pip install psycopg2-binary
      ```
 
 2. Database configuration
-   - SQLite was replaced with PostgreSQL to allow shared access across servers.
-   - Configure the backend with a shared PostgreSQL URL:
+   - PostgreSQL is used to allow shared access across servers.
+  - Configured the backend (db.py to be specific) with a shared PostgreSQL URL:
 
      ```python
-     DATABASE_URL = "postgresql://<user>:<password>@<web-01-ip>:5432/<db_name>"
+    DATABASE_URL = "postgresql://<db_user>:<db_password>@<db_host>:5432/<db_name>"
      ```
 
-   - PostgreSQL on Web-01 was configured to accept remote connections from Web-02.
+  - PostgreSQL was configured to accept remote connections from the other app servers.
 
 3. Running the backend
    - Serve the FastAPI app using Gunicorn with Uvicorn workers:
@@ -116,7 +135,7 @@ This application was deployed using a multi-server architecture with two applica
      ```
 
 4. Process management
-   - A systemd service keeps the backend running and restarts it automatically:
+  - A systemd service keeps the backend running and restarts it automatically:
 
      ```ini
      [Unit]
@@ -124,10 +143,10 @@ This application was deployed using a multi-server architecture with two applica
      After=network.target
 
      [Service]
-     User=ubuntu
-     WorkingDirectory=/home/ubuntu/Focus-time
-     Environment="PATH=/home/ubuntu/Focus-time/venv/bin"
-     ExecStart=/home/ubuntu/Focus-time/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 127.0.0.1:8000
+    User=<app_user>
+    WorkingDirectory=/path/to/Focused-learning-space
+    Environment="PATH=/path/to/Focused-learning-space/venv/bin"
+    ExecStart=/path/to/Focus-time/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 127.0.0.1:8000
      Restart=always
 
      [Install]
@@ -141,9 +160,9 @@ Nginx was configured on both Web-01 and Web-02 to serve the frontend and proxy A
 ```nginx
 server {
     listen 80;
-    server_name _;
+    server_name <your_domain>;
 
-    root /home/ubuntu/Focus-time/frontend;
+    root /path/to/Focused-learning-space/frontend;
     index index.html;
 
     location / {
@@ -164,7 +183,7 @@ Key points:
 - The frontend uses:
 
   ```javascript
-  const API_BASE_URL = "/api";
+  const API_BASE_URL = "api/";
   ```
 
 - FastAPI uses:
@@ -177,12 +196,12 @@ Key points:
 
 ### Load Balancer Configuration (HAProxy on lb-01)
 
-HAProxy distributes traffic between Web-01 and Web-02 using round-robin.
+HAProxy distributes traffic between app servers using round-robin.
 
 ```haproxy
 frontend http_in
     bind *:80
-    bind *:443 ssl crt /etc/ssl/certs/focuslearn.pem
+    bind *:443 ssl crt /path/to/ssl/cert.pem
     mode http
 
     redirect scheme https if !{ ssl_fc }
@@ -193,8 +212,8 @@ backend web_servers
     balance roundrobin
     option forwardfor
 
-    server web01 <WEB-01-IP>:80 check
-    server web02 <WEB-02-IP>:80 check
+    server web01 <APP_SERVER_1_IP>:80 check
+    server web02 <APP_SERVER_2_IP>:80 check
 ```
 
 Key points:
@@ -205,8 +224,8 @@ Key points:
 
 ### End-to-End Request Flow
 
-1. A client sends a request to the load balancer (lb-01) via HTTP or HTTPS.
-2. HAProxy forwards the request to either Web-01 or Web-02.
+1. A client sends a request to the load balancer via HTTP or HTTPS.
+2. HAProxy forwards the request to one of the app servers.
 3. Nginx on the selected server:
    - Serves static frontend files for /
    - Proxies /api/ requests to the local FastAPI backend
