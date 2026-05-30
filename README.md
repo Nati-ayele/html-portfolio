@@ -3,11 +3,14 @@
 A fullstack data engineering project that processes MTN Mobile Money (MoMo) SMS data exported in XML format. The pipeline parses, categorizes, and stores transaction records in a relational database, then exposes the data through a secured REST API.
 
 > 🔗 **Repository:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](https://github.com/Success85/Team8C3_momo-etl-dashboard)
-> 
-## Scrum Board
+> 🔗 **scrum board:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](https://github.com/Success85/Team8C3_momo-etl-dashboard)
+> 🔗 **team participation sheets:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](public)
+> 🔗 **AI usage logs:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](https://github.com/Success85/Team8C3_momo-etl-dashboard)
+> 🔗 **API pdf report:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](https://github.com/Success85/Team8C3_momo-etl-dashboard)
+> 🔗 **API documentation:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](https://github.com/Success85/Team8C3_momo-etl-dashboard)
 
-> 🔗 [View our GitHub Projects Scrum Board](https://github.com/users/Success85/projects/2/views/1)
-> 🔗 **team participation sheet:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](public)
+ 
+
 
 ---
 
