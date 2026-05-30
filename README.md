@@ -1,91 +1,160 @@
-# Team10 — MoMo ETL Dashboard
+# Team8C3 — MoMo SMS Data Processing System
 
-A fullstack data engineering project that processes MTN Mobile Money (MoMo) SMS data exported in XML format. The pipeline cleans, categorizes, and stores transaction records in a relational database, then exposes the data through a static frontend dashboard for analysis and visualization.
+A fullstack data engineering project that processes MTN Mobile Money (MoMo) SMS data exported in XML format. The pipeline parses, categorizes, and stores transaction records in a relational database, then exposes the data through a secured REST API.
 
-> 🔗 **Repository:** [https://github.com/Success85/Team10_momo-etl-dashboard](https://github.com/Success85/Team10_momo-etl-dashboard)
+> 🔗 **Repository:** [https://github.com/Success85/Team8C3_momo-etl-dashboard](https://github.com/Success85/Team8C3_momo-etl-dashboard)
 
 ---
 
 ## Team
 
+**Team Name:** Team8C3
+
 | Name | Role |
-|------|------|
-| Success | Database |
-| Nathael | Backend / ETL |
-| Michael | Frontend |
+|---|---|
+| Success Ituma | Database Implementation (SQLite + MySQL) + POST Endpoint + DSA |
+| Panom Michael Makuei | ERD Diagram + GET/PUT/DELETE Endpoints + Authentication + Scrum Board |
+| Nathnael Eticha Ayele | XML Parsing + ETL Pipeline + JSON Modeling + Repo Structure |
 
 ---
 
 ## Project Description
 
-MTN MoMo generates SMS notifications for every transaction — incoming payments, transfers, airtime purchases, bank deposits, and more. This project builds an end-to-end pipeline to:
+MTN MoMo generates an SMS notification for every transaction — incoming payments, transfers, airtime purchases, bank deposits, and more. This project builds an end-to-end pipeline to:
 
-1. **Parse** raw MoMo SMS data from an XML export file
-2. **Clean and normalize** amounts, dates, and phone numbers
-3. **Categorize** transactions by type using rule-based logic
+1. **Parse** raw MoMo SMS data from an XML backup file (1,693 records)
+2. **Clean and normalize** amounts, dates, and transaction types
+3. **Categorize** transactions using rule-based pattern matching
 4. **Load** structured records into a SQLite relational database
-5. **Export** aggregated JSON for frontend consumption
-6. **Visualize** transaction history, trends, and summaries on a dashboard
+5. **Expose** transaction data through a secured REST API
+6. **Visualize** transaction history and summaries on a frontend dashboard
 
 ---
 
 ## Repository Structure
 
 ```
-momo-data-pipeline/
-├── README.md                         # Setup, run instructions, overview
-├── .env.example                      # Environment variable template
-├── requirements.txt                  # Python dependencies
-├── index.html                        # Dashboard entry point (static)
+Team8C3_momo-etl-dashboard/
+├── README.md
+├── .env.example
+├── requirements.txt
+├── index.html
 ├── web/
-│   ├── styles.css                    # Dashboard styling
-│   ├── chart_handler.js              # Fetch + render charts and tables
-│   └── assets/                       # Images and icons
+│   ├── styles.css
+│   ├── chart_handler.js
+│   └── assets/
 ├── data/
-│   ├── raw/                          # Raw XML input (git-ignored)
+│   ├── raw/
+│   │   ├── modified_sms_v2.xml
 │   │   └── momo.xml
-│   ├── processed/                    # Cleaned outputs for frontend
+│   ├── processed/
 │   │   └── dashboard.json
-│   ├── db.sqlite3                    # SQLite database file
+│   ├── momo.db
 │   └── logs/
-│       ├── etl.log                   # Structured ETL run logs
-│       └── dead_letter/              # Unparsed or ignored XML snippets
+│       ├── etl.log
+│       └── dead_letter/
 ├── etl/
 │   ├── __init__.py
-│   ├── config.py                     # File paths, thresholds, categories
-│   ├── parse_xml.py                  # XML parsing with ElementTree/lxml
-│   ├── clean_normalize.py            # Amounts, dates, phone normalization
-│   ├── categorize.py                 # Rule-based transaction categorization
-│   ├── load_db.py                    # Table creation and upsert to SQLite
-│   └── run.py                        # CLI: parse → clean → categorize → load → export
-├── api/                              # Optional bonus
+│   ├── config.py
+│   ├── parse_xml.py
+│   ├── clean_normalize.py
+│   ├── categorize.py
+│   ├── load_db.py
+│   └── run.py
+├── api/
 │   ├── __init__.py
-│   ├── app.py                        # FastAPI app with /transactions, /analytics
-│   ├── db.py                         # SQLite connection helpers
-│   └── schemas.py                    # Pydantic response models
+│   ├── app.py
+│   ├── db.py
+│   └── schemas.py
+├── dsa/
+│   └── search.py
 ├── scripts/
-│   ├── run_etl.sh                    # Runs the full ETL pipeline
-│   ├── export_json.sh                # Rebuilds dashboard.json from DB
-│   └── serve_frontend.sh             # Serves the static frontend locally
-└── tests/
-    ├── test_parse_xml.py
-    ├── test_clean_normalize.py
-    └── test_categorize.py
+│   ├── run_etl.sh
+│   ├── export_json.sh
+│   └── serve_frontend.sh
+├── tests/
+│   ├── test_parse_xml.py
+│   ├── test_clean_normalize.py
+│   └── test_categorize.py
+├── database/
+│   └── database_setup.sql
+├── docs/
+│   ├── architecture.jpg
+│   ├── erd_diagram.png
+│   ├── api_docs.md
+│   └── database_design_document.pdf
+├── screenshots/
+│   ├── 01_get_unauthorized.png
+│   ├── 02_get_wrong_credentials.png
+│   ├── 03_get_all_transactions.png
+│   ├── 04_get_one_transaction.png
+│   ├── 05_post_transaction.png
+│   ├── 06_put_transaction.png
+│   ├── 07_delete_transaction.png
+│   └── 08_dsa_comparison.png
+└── examples/
+    └── json_schemas.json
 ```
 
 ---
 
-## System Architecture
+## Database Design (Week 2)
 
-![Architecture Diagram](docs/architecture.png)
+The database schema is implemented in MySQL and documented in `docs/database_design_document.pdf`. It consists of 6 tables derived from analyzing real MoMo SMS data.
 
-> 🔗 [View full diagram on Draw.io](#) ← _Replace this link after diagram is created_
+| Table | Description |
+|---|---|
+| `transaction_categories` | Lookup table for 7 MoMo transaction types |
+| `users` | Account holder and all counterparties |
+| `sms_messages` | Raw SMS records from the XML backup |
+| `transactions` | Parsed financial records |
+| `transaction_participants` | Junction table resolving M:N between transactions and users |
+| `system_logs` | Audit trail for all processing events |
+
+> Full schema: `database/database_setup.sql`
+> Full documentation: `docs/database_design_document.pdf`
 
 ---
 
-## Scrum Board
+## REST API (Week 3)
 
-> 🔗 [View our GitHub Projects Scrum Board](#) ← _Replace this link after board is created_
+A secured REST API built with Python's `http.server` that exposes the MoMo transaction data. All endpoints require Basic Authentication.
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/transactions` | List all transactions |
+| GET | `/transactions/{id}` | Get one transaction by ID |
+| POST | `/transactions` | Add a new transaction |
+| PUT | `/transactions/{id}` | Update an existing transaction |
+| DELETE | `/transactions/{id}` | Delete a transaction |
+
+> Full API documentation: `docs/api_docs.md`
+
+### Authentication
+
+All endpoints are protected with Basic Authentication.
+
+```
+Username: admin
+Password: MOMO123
+```
+
+Requests without valid credentials return `401 Unauthorized`.
+
+---
+
+## DSA — Search Efficiency (Week 3)
+
+`dsa/search.py` implements and compares two search algorithms against the full transaction dataset:
+
+| Algorithm | Time Complexity | Average Time (4,177 records) |
+|---|---|---|
+| Linear Search | O(n) | 1.5528 ms |
+| Dictionary Lookup | O(1) | 0.0051 ms |
+
+Dictionary lookup is **307x faster** than linear search on this dataset.
 
 ---
 
@@ -95,34 +164,102 @@ momo-data-pipeline/
 
 - Python 3.9+
 - pip
+- MySQL Server 8.0+ (for Week 2 database)
+- MySQL Workbench (optional)
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/Success85/Team10_momo-etl-dashboard.git
-cd Team10_momo-etl-dashboard
-
-# Install dependencies
+git clone https://github.com/Success85/Team8C3_momo-etl-dashboard.git
+cd Team8C3_momo-etl-dashboard
 pip install -r requirements.txt
-
-# Copy environment variables
 cp .env.example .env
 ```
 
-### Running the ETL Pipeline
+### Run the ETL Pipeline
+
+Parses the XML file and loads transactions into the SQLite database:
 
 ```bash
-# Place your momo.xml file in data/raw/
-bash scripts/run_etl.sh
+python3 etl/run.py
 ```
 
-### Serving the Dashboard
+### Start the API Server
+
+```bash
+python3 api/app.py
+```
+
+Server runs at `http://localhost:8000`.
+
+### Test the API
+
+```bash
+# Get all transactions
+curl -u admin:MOMO123 http://localhost:8000/transactions
+
+# Get one transaction
+curl -u admin:MOMO123 http://localhost:8000/transactions/1
+
+# Add a new transaction
+curl -u admin:MOMO123 -X POST -H "Content-Type: application/json" \
+  -d '{"transaction_type": "MERCHANT_PAY", "amount": 3000, "sender": "Account Owner"}' \
+  http://localhost:8000/transactions
+```
+
+### Run the MySQL Schema (Week 2)
+
+```bash
+mysql -u root -p < database/database_setup.sql
+```
+
+### Run the DSA Comparison
+
+```bash
+python3 dsa/search.py
+```
+
+### Serve the Dashboard
 
 ```bash
 bash scripts/serve_frontend.sh
-# Then open http://localhost:8000 in your browser
+# Open http://localhost:8000
 ```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Database (Week 2) | MySQL 8.0 |
+| Database (Week 3) | SQLite via Python |
+| ETL Pipeline | Python (ElementTree, re, dateutil) |
+| REST API | Python http.server |
+| Data Validation | Python (schemas.py) |
+| DSA | Python (linear search, dictionary lookup) |
+| Frontend | HTML, CSS, JavaScript |
+| Visualization | Chart.js |
+| Version control | Git + GitHub |
+| Project management | GitHub Projects |
+
+---
+
+## Scrum Board
+
+> 🔗 [View our GitHub Projects Scrum Board](https://github.com/users/Success85/projects/2/views/1)
+> 
+> ## team participation sheets
+
+> 🔗 [View our GitHub Projects Scrum Board](https://github.com/users/Success85/projects/2/views/1)
+
+---
+
+## System Architecture
+
+![Architecture Diagram](docs/architecture.jpg)
+
+> 🔗 [View full diagram](https://drive.google.com/file/d/1osJvG8CJ-X3vtCAiOSXfQrCpunGgx8CZ/view?usp=sharing)
 
 ---
 
@@ -130,19 +267,6 @@ bash scripts/serve_frontend.sh
 
 - Raw XML files in `data/raw/` are **git-ignored** to protect sensitive transaction data
 - Processed outputs in `data/processed/` contain only aggregated, anonymized summaries
-- Unparseable records are saved to `data/logs/dead_letter/` for review
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Data parsing | Python (ElementTree / lxml) |
-| Data cleaning | Python (dateutil, re) |
-| Database | SQLite |
-| Backend API (optional) | FastAPI + Pydantic |
-| Frontend | HTML, CSS, JavaScript |
-| Visualization | Chart.js |
-| Version control | Git + GitHub |
-| Project management | GitHub Projects |
+- Unparseable SMS records are saved to `data/logs/dead_letter/` for review
+- All financial amounts are stored in Rwandan Franc (RWF)
+- The SQLite database file `data/momo.db` is also git-ignored
